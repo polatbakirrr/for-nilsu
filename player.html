@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalbimde Atan Ses</title>
+
+<style>
+body{
+margin:0;
+font-family:system-ui,-apple-system;
+background:#121212;
+color:white;
+height:100vh;
+display:flex;
+justify-content:center;
+}
+
+.app{
+width:100%;
+max-width:430px;
+display:flex;
+flex-direction:column;
+}
+
+/* MAIN */
+
+.main{
+padding:20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+.cover{
+width:85%;
+aspect-ratio:1/1;
+border-radius:12px;
+background-image:url("cover.jpeg");
+background-size:cover;
+background-position:center;
+margin:20px 0;
+box-shadow:0 15px 40px rgba(0,0,0,.6);
+}
+
+.track{font-size:22px;font-weight:600;}
+.artist{opacity:.7;margin-bottom:10px;}
+
+.progress-wrap{width:100%;}
+
+.progress{
+height:4px;
+background:#333;
+border-radius:2px;
+overflow:hidden;
+cursor:pointer;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:#1db954;
+}
+
+.time{
+display:flex;
+justify-content:space-between;
+font-size:11px;
+opacity:.6;
+margin-top:6px;
+}
+
+.controls{
+display:flex;
+justify-content:center;
+margin:20px 0;
+}
+
+.play{
+background:#1db954;
+border:none;
+width:70px;
+height:70px;
+border-radius:50%;
+font-size:28px;
+color:black;
+cursor:pointer;
+box-shadow:0 10px 30px rgba(30,215,96,.4);
+}
+
+/* LYRICS */
+
+.lyrics{
+flex:1;
+overflow-y:auto;
+padding:10px 20px 30px;
+text-align:center;
+opacity:0;
+pointer-events:none;
+transition:1s ease;
+scrollbar-width:none;
+-ms-overflow-style:none;
+}
+
+.lyrics.show{opacity:1;pointer-events:auto;}
+.lyrics::-webkit-scrollbar{display:none;}
+
+.line{opacity:.4;margin:10px 0;transition:.4s;}
+.line.active{opacity:1;color:#1db954;font-weight:600;font-size:18px;}
+
+/* FOOTER */
+
+.footer{
+height:70px;
+background:#181818;
+display:flex;
+align-items:center;
+padding:0 15px;
+gap:12px;
+}
+
+.mini-cover{
+width:45px;
+height:45px;
+border-radius:6px;
+background-image:url("cover.jpeg");
+background-size:cover;
+background-position:center;
+}
+
+.mini-title{font-size:13px;}
+.mini-artist{font-size:11px;opacity:.6;}
+
+audio{display:none;}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="main">
+
+<div class="cover"></div>
+
+<div class="track">Kalbimde Atan Ses</div>
+<div class="artist">Minik Nilsu</div>
+
+<div class="progress-wrap">
+<div class="progress" id="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+<div class="time">
+<span id="current">0:00</span>
+<span id="duration">0:00</span>
+</div>
+</div>
+
+<div class="controls">
+<button class="play" id="play">▶</button>
+</div>
+
+</div>
+
+<div class="lyrics" id="lyrics"></div>
+
+<div class="footer">
+<div class="mini-cover"></div>
+<div>
+<div class="mini-title">Kalbimde Atan Ses</div>
+<div class="mini-artist">Minik Nilsu</div>
+</div>
+</div>
+
+<audio id="audio">
+<source src="song.mp3">
+</audio>
+
+</div>
+
+<script>
+
+const audio=document.getElementById("audio");
+const play=document.getElementById("play");
+const bar=document.getElementById("bar");
+const progress=document.getElementById("progress");
+const current=document.getElementById("current");
+const duration=document.getElementById("duration");
+const lyricsBox=document.getElementById("lyrics");
+
+/* Timestamped lyrics */
+const lyricsData=[
+{t:16,text:"Kalbimde atan ses"},
+{t:21,text:"Ne kadar unutabilirsin"},
+{t:25,text:"Ama bu ses hiç çıkmaz"},
+{t:27,text:"Unuttuğun ses kalp sesidir"},
+{t:32,text:"Bugün her şeyindir"},
+{t:35,text:"Sevdiğin her şeydir"},
+{t:39,text:"Benim için her şey benim olsun"},
+{t:41,text:"Sevmekte olduğun"},
+{t:45,text:"Çünkü ben seninim"},
+{t:50,text:"Her şeyin bir sesi var"},
+{t:55,text:"Bu ses benim sesim"},
+{t:60,text:"Her şeyin bir sesi var"},
+{t:64,text:"Bu ses benim sesim"},
+{t:83,text:"Kalbimde atan ses"},
+{t:87,text:"Ne kadar unutabilirsin"},
+{t:91,text:"Ama bu ses hiç çıkmaz"},
+{t:94,text:"Unuttuğun ses kalp sesidir"},
+{t:98,text:"Bugün her şeyindir"},
+{t:102,text:"Sevdiğin her şeydir"},
+{t:106,text:"Benim için her şey benim olsun"},
+{t:109,text:"Sevmekte olduğun"},
+{t:112,text:"Çünkü ben seninim"},
+{t:117,text:"Her şeyin bir sesi var"},
+{t:122,text:"Bu ses benim sesim"},
+{t:127,text:"Her şeyin bir sesi var"},
+{t:131,text:"Bu ses benim sesim"},
+{t:153,text:"Her şeyin bir sesi var"},
+{t:157,text:"Bu ses benim sesim"},
+{t:161,text:"Her şeyin bir sesi var"},
+{t:166,text:"Bu ses benim sesim"}
+];
+
+let lyricsShown=false;
+
+// render lyrics
+lyricsData.forEach(l=>{
+let d=document.createElement("div");
+d.className="line";
+d.innerText=l.text;
+lyricsBox.appendChild(d);
+});
+
+// controls
+play.onclick=()=>audio.paused?audio.play():audio.pause();
+audio.onplay=()=>play.innerHTML="⏸";
+audio.onpause=()=>play.innerHTML="▶";
+audio.onended=()=>play.innerHTML="▶";
+
+audio.onloadedmetadata=()=>duration.innerHTML=format(audio.duration);
+
+audio.ontimeupdate=()=>{
+
+bar.style.width=(audio.currentTime/audio.duration*100)+"%";
+current.innerHTML=format(audio.currentTime);
+
+// show lyrics at 16s
+if(audio.currentTime>=16 && !lyricsShown){
+lyricsBox.classList.add("show");
+lyricsShown=true;
+}
+
+// highlight lyric
+if(lyricsShown){
+for(let i=0;i<lyricsData.length;i++){
+if(audio.currentTime>=lyricsData[i].t){
+document.querySelectorAll(".line").forEach(l=>l.classList.remove("active"));
+let a=document.querySelectorAll(".line")[i];
+a.classList.add("active");
+a.scrollIntoView({behavior:"smooth",block:"center"});
+}
+}
+}
+
+};
+
+// seek
+progress.onclick=e=>{
+const r=progress.getBoundingClientRect();
+audio.currentTime=(e.clientX-r.left)/r.width*audio.duration;
+};
+
+function format(sec){
+let m=Math.floor(sec/60);
+let s=Math.floor(sec%60);
+return m+":"+(s<10?"0":"")+s;
+}
+
+</script>
+
+</body>
+</html>

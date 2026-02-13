@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For Nilsu ❤️</title>
+
+<style>
+:root{
+--bg:#120015;
+--card:#2b0f24cc;
+--text:#ffe6ef;
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:black;
+color:var(--text);
+overflow-x:hidden;
+}
+
+/* INTRO COUNTDOWN */
+#intro{
+position:fixed;
+inset:0;
+background:black;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:10;
+transition:1.5s;
+}
+
+#intro h1{font-size:48px;margin:0;}
+#intro h2{opacity:.7;margin-top:10px}
+
+/* MAIN CONTENT */
+#main{
+display:none;
+background:radial-gradient(circle at top,#2b0033,var(--bg));
+min-height:100vh;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:var(--card);
+backdrop-filter:blur(14px);
+border-radius:28px;
+padding:30px;
+margin:25px 0;
+box-shadow:0 10px 40px rgba(255,0,120,.25);
+text-align:center;
+}
+
+.hero h1{font-size:42px;margin:0}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:15px;
+margin-top:20px;
+}
+
+.stat{
+background:#ffffff10;
+border-radius:18px;
+padding:15px;
+}
+
+.stat h2{margin:5px 0;font-size:28px}
+
+ul{text-align:left;max-width:500px;margin:auto;padding-left:20px}
+
+.present-btn{
+background:#1db954;
+border:none;
+padding:16px 40px;
+border-radius:30px;
+font-size:20px;
+color:black;
+cursor:pointer;
+}
+
+/* FLOATING PARTICLES */
+.particle{
+position:fixed;
+bottom:-20px;
+pointer-events:none;
+animation:float linear infinite;
+opacity:.7;
+}
+
+@keyframes float{
+to{transform:translateY(-120vh);}
+}
+
+@media(max-width:600px){
+.hero h1{font-size:32px}
+#intro h1{font-size:36px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="intro">
+<h1 id="introCountdown"></h1>
+<h2>14 February</h2>
+</div>
+
+<audio id="ambient" src="ambient.mp3" loop></audio>
+
+<div id="main">
+
+<div class="container">
+
+<div class="card hero">
+<h1>For Nilsu ❤️</h1>
+<p>I made something special for you</p>
+<p><strong>Since 22 December 2024</strong></p>
+<h2 id="together"></h2>
+</div>
+
+<div class="card">
+<h2>My dear love,</h2>
+<p>
+You know, I am not always perfect with words..<br>
+Every second with you is precious to me.<br>
+I’m grateful for us.<br>
+I love you &lt;3
+</p>
+</div>
+
+<div class="card">
+<h2>Things I love about you</h2>
+<ul>
+<li>your <b>EYES</b></li>
+<li>your <b>SMELL</b></li>
+<li>your <b>INTELLIGENT</b></li>
+</ul>
+</div>
+
+<div class="card">
+<h2>So here is my best brownie recipe</h2>
+<p>
+3 Egg<br>
+1 Glass Sugar<br>
+1 Glass Flavour<br>
+100g Butter<br>
+1 Vanilla<br>
+100–150g Dark Chocolate
+</p>
+</div>
+
+<div class="card">
+<h2>Our Story</h2>
+
+<div class="stats">
+<div class="stat"><h2 id="hugs"></h2>🤍 Hugs</div>
+<div class="stat"><h2 id="kisses"></h2>😘 Kisses</div>
+<div class="stat"><h2 id="sleep"></h2>😴 Nights</div>
+<div class="stat"><h2 id="brownies"></h2>🍫 Brownies</div>
+<div class="stat"><h2 id="romance"></h2>🔥 Moments</div>
+</div>
+
+</div>
+
+<div class="card">
+<h2>I have one more thing for you 🎁</h2>
+<p>👇 click here 👇</p>
+
+<a href="player.html">
+<button class="present-btn">YOUR GIFT HERE</button>
+</a>
+
+<p>Seni çok seviyorum bebişimmmm &lt;3</p>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const reveal=new Date("2026-02-13T19:12:00");
+const start=new Date("2024-12-22T10:00:00");
+
+const rates={hugs:20,kisses:35,sleep:3.5,brownies:1,romance:1.5};
+
+// ambient plays only during countdown
+document.body.onclick=()=>ambient.play();
+
+function update(){
+
+let now=new Date();
+let diff=now-start;
+let days=diff/86400000;
+let weeks=days/7;
+let cd=reveal-now;
+
+introCountdown.innerHTML=
+`${Math.floor(cd/86400000)}d ${Math.floor(cd/3600000%24)}h ${Math.floor(cd/60000%60)}m ${Math.floor(cd/1000%60)}s`;
+
+if(cd<=0){
+
+intro.style.opacity=0;
+
+setTimeout(()=>{
+intro.style.display="none";
+main.style.display="block";
+},1500);
+
+// fade ambient
+let fade=setInterval(()=>{
+if(ambient.volume>0.05)ambient.volume-=.05;
+else{ambient.pause();clearInterval(fade);}
+},200);
+
+// stats
+together.innerHTML=
+`${Math.floor(days)}d ${Math.floor(diff/3600000%24)}h ${Math.floor(diff/60000%60)}m ${Math.floor(diff/1000%60)}s`;
+
+hugs.innerHTML=Math.floor(days*rates.hugs);
+kisses.innerHTML=Math.floor(days*rates.kisses);
+sleep.innerHTML=Math.floor(weeks*rates.sleep);
+brownies.innerHTML=Math.floor(weeks*rates.brownies);
+romance.innerHTML=Math.floor(weeks*rates.romance);
+
+}
+
+}
+
+setInterval(update,1000);
+update();
+
+// floating hearts / sparkles AFTER reveal
+setInterval(()=>{
+if(main.style.display==="block"){
+let p=document.createElement("div");
+p.className="particle";
+p.innerHTML=Math.random()>.7?"❤️":"✨";
+p.style.left=Math.random()*100+"vw";
+p.style.fontSize=12+Math.random()*26+"px";
+p.style.animationDuration=6+Math.random()*6+"s";
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),12000);
+}
+},350);
+
+</script>
+
+</body>
+</html>
